@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { analyzeCommits } from "@semantic-release/commit-analyzer";
+import { generateNotes } from "@semantic-release/release-notes-generator";
 import { parse } from "yaml";
 import { prepare, verifyConditions } from "../scripts/helm-release.mjs";
 
@@ -51,6 +52,19 @@ test("packaged Chart version, index and digest agree, while old release URLs are
   } finally {
     await rm(cwd, { recursive: true, force: true });
   }
+});
+
+test("release notes render with the same preset used by the version analyzer", async () => {
+  const notes = await generateNotes({ preset: "conventionalcommits" }, {
+    cwd: root,
+    logger,
+    commits: [{ hash: "abc1234", message: "feat: add a service port" }],
+    lastRelease: {},
+    nextRelease: { version: "1.0.0", gitTag: "standard-v1.0.0", gitHead: "abc1234" },
+    options: { repositoryUrl: "https://github.com/example/charts" },
+  });
+  assert.match(notes, /1\.0\.0/);
+  assert.match(notes, /add a service port/);
 });
 
 test("invalid destination or tag fails before packaging", async () => {
