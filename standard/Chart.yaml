@@ -1,8 +1,9 @@
 apiVersion: v2
 name: standard
-description: Reusable application chart with explicit resource budgets and optional HTTP routing, autoscaling, storage and monitoring.
+description: Reusable application chart with explicit resource budgets and
+  optional HTTP routing, autoscaling, storage and monitoring.
 type: application
-version: 0.1.0
+version: 1.0.0
 kubeVersion: ">=1.25.0-0"
 keywords:
   - application

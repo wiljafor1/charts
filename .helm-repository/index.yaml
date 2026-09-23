@@ -1,0 +1,19 @@
+apiVersion: v1
+entries:
+  standard:
+  - apiVersion: v2
+    created: "2026-09-23T06:09:07.897756352Z"
+    description: Reusable application chart with explicit resource budgets and optional
+      HTTP routing, autoscaling, storage and monitoring.
+    digest: 89532a61148be04e99c4e61b49fe2fc652db6def8f7b70cff39518295939812c
+    keywords:
+    - application
+    - deployment
+    - resources
+    kubeVersion: '>=1.25.0-0'
+    name: standard
+    type: application
+    urls:
+    - https://github.com/wiljafor1/charts/releases/download/standard-v1.0.0/standard-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-09-23T06:09:07.896856449Z"
