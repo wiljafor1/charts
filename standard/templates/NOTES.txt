@@ -1,0 +1,22 @@
+Application: {{ include "standard.fullname" . }}
+Namespace: {{ .Release.Namespace }}
+
+Inspect rollout:
+  kubectl -n {{ .Release.Namespace }} rollout status deployment/{{ include "standard.fullname" . }}
+  kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+{{- if .Values.service.enabled }}
+
+Local access:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "standard.fullname" . }} 8080:{{ .Values.service.port }}
+{{- end }}
+{{- if .Values.ingress.enabled }}
+
+Ingress hosts (DNS and TLS Secrets are managed separately):
+{{- range .Values.ingress.hosts }}
+  {{ .host }}
+{{- end }}
+{{- end }}
+{{- if and .Values.persistence.enabled .Values.persistence.retain (not .Values.persistence.existingClaim) }}
+
+PVC {{ include "standard.fullname" . }} is retained on uninstall. Manage data cleanup separately.
+{{- end }}

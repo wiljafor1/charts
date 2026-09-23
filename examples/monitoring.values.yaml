@@ -1,0 +1,7 @@
+# Overlay: the app must actually expose Prometheus metrics at /metrics.
+serviceMonitor:
+  enabled: true
+  interval: 60s
+  scrapeTimeout: 10s
+  # Set labels here if the Prometheus instance restricts its monitor selector.
+  labels: {}

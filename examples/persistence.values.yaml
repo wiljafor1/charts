@@ -1,0 +1,13 @@
+# Overlay for ONE replica. A single-writer PVC forces Recreate (brief downtime).
+# The app must support storing its data in /data.
+persistence:
+  enabled: true
+  size: 1Gi
+  accessModes: [ReadWriteOnce]
+  storageClass: ""
+  mountPath: /data
+  retain: true
+# Use a filesystem group compatible with the app's non-root user and volume.
+podSecurityContext:
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch

@@ -1,0 +1,18 @@
+{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "standard.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "standard.labels" . | nindent 4 }}
+spec:
+  {{- if ne .Values.pdb.minAvailable nil }}
+  minAvailable: {{ .Values.pdb.minAvailable | toJson }}
+  {{- else }}
+  maxUnavailable: {{ .Values.pdb.maxUnavailable | toJson }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "standard.selectorLabels" . | nindent 6 }}
+{{- end }}

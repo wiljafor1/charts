@@ -1,0 +1,177 @@
+# One release deploys one application/container. Set the image for each app.
+nameOverride: ""
+fullnameOverride: ""
+commonLabels: {}
+
+replicaCount: 1
+revisionHistoryLimit: 3
+progressDeadlineSeconds: 600
+terminationGracePeriodSeconds: 30
+# No additional pod during rollouts. A single replica has brief downtime.
+# Use maxSurge: 1 and maxUnavailable: 0 only when capacity allows it.
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 1
+
+image:
+  repository: ""
+  # Explicit tag OR digest is required. Digest takes precedence over tag.
+  tag: ""
+  digest: ""
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+command: []
+args: []
+containerPort: 8080
+
+# Baseline for a small app; measure startup and load before increasing replicas.
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+    ephemeral-storage: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+    ephemeral-storage: 512Mi
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: false
+
+podAnnotations: {}
+podLabels: {}
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]
+
+# Disk-backed /tmp; included in the pod's ephemeral-storage consumption.
+tmpVolume:
+  enabled: true
+  sizeLimit: 64Mi
+
+# Kubernetes env/envFrom syntax. Reference existing Secrets; do not put secrets
+# in values files. Values in env[].value must be quoted strings.
+env: []
+envFrom: []
+configMap:
+  enabled: false
+  # Automatically inject keys as environment variables. Disable for file config.
+  envFrom: true
+  data: {}
+# File config can use a ConfigMap volume referencing <fullname>-config.
+extraVolumes: []
+extraVolumeMounts: []
+
+# Supported probe handlers: httpGet, tcpSocket, exec or grpc.
+# Startup protects slow starts. Replace TCP checks with app health endpoints.
+startupProbe:
+  enabled: true
+  type: tcpSocket
+  tcpSocket:
+    port: http
+  periodSeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 30
+readinessProbe:
+  enabled: true
+  type: tcpSocket
+  tcpSocket:
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+livenessProbe:
+  enabled: false
+  type: httpGet
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+lifecycle: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  annotations: {}
+  # Optional metrics/management ports. Names must be unique, not "http".
+  extraPorts: []
+  # - name: metrics
+  #   port: 9090
+  #   targetPort: 9090
+  #   protocol: TCP
+
+ingress:
+  enabled: false
+  # Empty uses the cluster's default IngressClass; set explicitly per environment.
+  className: ""
+  annotations: {}
+  hosts: []
+  # - host: app.example.com
+  #   paths:
+  #     - path: /
+  #       pathType: Prefix
+  tls: []
+  # - secretName: app-tls
+  #   hosts: [app.example.com]
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+  # Null disables a metric; at least one CPU or memory metric is required.
+  targetMemoryUtilizationPercentage: null
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+
+pdb:
+  enabled: false
+  # Set one of minAvailable/maxUnavailable; do not set both.
+  minAvailable: null
+  maxUnavailable: null
+
+persistence:
+  enabled: false
+  existingClaim: ""
+  # Empty uses the default StorageClass. "-" explicitly requests no class.
+  storageClass: ""
+  accessModes: [ReadWriteOnce]
+  size: 1Gi
+  mountPath: /data
+  subPath: ""
+  # Retain a chart-created PVC on uninstall; deletion/cleanup is manual.
+  retain: true
+  annotations: {}
+  # Single-writer accessModes require one replica and no HPA. The chart selects
+  # Recreate to avoid overlapping pods during upgrades. RWX may use rolling.
+
+serviceMonitor:
+  enabled: false
+  # Prometheus Operator CRD must exist. Labels must match your Prometheus selector.
+  labels: {}
+  port: http
+  path: /metrics
+  interval: 60s
+  scrapeTimeout: 10s
+  scheme: http
+  honorLabels: false
+  relabelings: []
+  metricRelabelings: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []
+priorityClassName: ""

@@ -1,0 +1,20 @@
+{
+  "name": "helm-chart-release-tooling",
+  "private": true,
+  "description": "Conventional Commit release automation for a Helm application chart",
+  "engines": { "node": ">=24.10.0" },
+  "scripts": {
+    "test": "node --test tests/release.test.mjs",
+    "release": "semantic-release"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/commit-analyzer": "13.0.1",
+    "@semantic-release/git": "10.0.1",
+    "@semantic-release/github": "12.0.10",
+    "@semantic-release/release-notes-generator": "14.1.1",
+    "conventional-changelog-conventionalcommits": "10.4.0",
+    "semantic-release": "25.0.9",
+    "yaml": "2.9.1"
+  }
+}
